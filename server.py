@@ -1,16 +1,30 @@
+## Echo server program
 import socket
+import subprocess
 
-TCP_IP = '127.0.0.1'
-TCP_PORT = 5005
-BUFFER_SIZE = 20  # Normally 1024, but we want fast response
+
+def get_routing_table():
+  completed_proc = subprocess.run(['ip route'], shell=True, stdout=subprocess.PIPE)
+  return completed_proc.stdout
+
+
+HOST = ''                 # Symbolic name meaning all available interfaces
+PORT = 50008              # Arbitrary non-privileged port
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-s.bind((TCP_IP, TCP_PORT))
-s.listen(1)
+s.bind((HOST, PORT))
+s.listen()
 conn, addr = s.accept()
-print ('Connection address:', addr)
-while 1:
-  data = conn.recv(BUFFER_SIZE)
-  if not data: break
-  print ("received data:", data)
-  conn.send(data)  # echo
-conn.close()
+if conn:
+  print('Connected by', addr)
+  while True:
+    data = conn.recv(1024)
+    print(data.decode())
+    if not data: break
+    elif data.decode('utf-8') == 'get route table':
+      data_to_send = get_routing_table()
+      conn.sendall(data_to_send)
+
+
+
+
+
