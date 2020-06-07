@@ -1,9 +1,9 @@
-## Echo server program
 import socket
 import subprocess
 
 
 def get_routing_table():
+  """Returns routing table as string"""
   completed_proc = subprocess.run(['ip route'], shell=True, stdout=subprocess.PIPE)
   return completed_proc.stdout
 
